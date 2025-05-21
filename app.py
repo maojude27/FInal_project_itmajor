@@ -12,9 +12,23 @@ UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# -------------------- Get DB Connection --------------------
+def get_db_connection():
+    conn = sqlite3.connect('food_ordering.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def get_all_categories():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT category_id, name FROM categories")
+    categories = cursor.fetchall()
+    conn.close()
+    return categories
+
 # -------------------- Initialize DB --------------------
 def init_db():
-    conn = sqlite3.connect('food_ordering.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -47,17 +61,18 @@ def init_db():
     ''')
 
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS menu_items (
-            item_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            category_id INTEGER,
-            restaurant_id INTEGER,
-            name TEXT,
-            description TEXT,
-            price INTEGER,
-            FOREIGN KEY (category_id) REFERENCES categories(category_id),
-            FOREIGN KEY (restaurant_id) REFERENCES restaurants(restaurant_id)
-        )
-    ''')
+    CREATE TABLE IF NOT EXISTS menu_items (
+        item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        price REAL NOT NULL,
+        category_id INTEGER NOT NULL,
+        restaurant_id INTEGER NOT NULL,
+        image TEXT,
+        FOREIGN KEY (category_id) REFERENCES categories(category_id),
+        FOREIGN KEY (restaurant_id) REFERENCES restaurants(restaurant_id)
+    )
+''')
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS orders (
@@ -129,6 +144,7 @@ def init_db():
         )
     ''')
 
+    # Create default admin if not exists
     cursor.execute("SELECT * FROM users WHERE email = 'admin@example.com'")
     if not cursor.fetchone():
         hashed_admin_pw = generate_password_hash("admin123!")
@@ -162,24 +178,25 @@ def register():
 
         hashed_password = generate_password_hash(password)
 
-        with sqlite3.connect('food_ordering.db') as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE email=?", (email,))
-            if cursor.fetchone():
-                flash('Email already registered.', 'danger')
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+        if cursor.fetchone():
+            flash('Email already registered.', 'danger')
+            return render_template('register.html')
+
+        cursor.execute("SELECT password FROM users")
+        existing_passwords = [row[0] for row in cursor.fetchall()]
+        for p in existing_passwords:
+            if check_password_hash(p, password):
+                flash('This password is already in use by another user.', 'danger')
                 return render_template('register.html')
 
-            cursor.execute("SELECT password FROM users")
-            existing_passwords = [row[0] for row in cursor.fetchall()]
-            for p in existing_passwords:
-                if check_password_hash(p, password):
-                    flash('This password is already in use by another user.', 'danger')
-                    return render_template('register.html')
-
-            cursor.execute("INSERT INTO users (email, password, role) VALUES (?, ?, ?)", (email, hashed_password, 'customer'))
-            conn.commit()
-            flash('Registration successful! Please log in.', 'success')
-            return redirect(url_for('login'))
+        cursor.execute("INSERT INTO users (email, password, role) VALUES (?, ?, ?)", (email, hashed_password, 'customer'))
+        conn.commit()
+        conn.close()
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('login'))
 
     return render_template('register.html')
 
@@ -189,14 +206,15 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        with sqlite3.connect('food_ordering.db') as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE email=? AND role='customer'", (email,))
-            user = cursor.fetchone()
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE email=? AND role='customer'", (email,))
+        user = cursor.fetchone()
+        conn.close()
 
-        if user and check_password_hash(user[5], password):
-            session['user_id'] = user[0]
-            session['name'] = user[1] or "Customer"
+        if user and check_password_hash(user['password'], password):
+            session['user_id'] = user['user_id']
+            session['name'] = user['name'] or "Customer"
             flash('Login successful!', 'success')
             return redirect(url_for('dashboard'))
         else:
@@ -210,14 +228,15 @@ def admin_login():
         username = request.form['username']
         password = request.form['password']
 
-        with sqlite3.connect('food_ordering.db') as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE email=? AND role='admin'", (username,))
-            admin = cursor.fetchone()
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE email=? AND role='admin'", (username,))
+        admin = cursor.fetchone()
+        conn.close()
 
-        if admin and check_password_hash(admin[5], password):
-            session['admin_id'] = admin[0]
-            session['admin_name'] = admin[1]
+        if admin and check_password_hash(admin['password'], password):
+            session['admin_id'] = admin['user_id']
+            session['admin_name'] = admin['name']
             flash('Admin login successful.', 'success')
             return redirect(url_for('admin_dashboard'))
         else:
@@ -237,17 +256,18 @@ def admin_register():
 
         hashed_password = generate_password_hash(password)
 
-        with sqlite3.connect('food_ordering.db') as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE email=?", (email,))
-            if cursor.fetchone():
-                flash('Email already registered.', 'danger')
-                return render_template('admin_register.html')
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+        if cursor.fetchone():
+            flash('Email already registered.', 'danger')
+            return render_template('admin_register.html')
 
-            cursor.execute("INSERT INTO users (email, password, role) VALUES (?, ?, ?)", (email, hashed_password, 'admin'))
-            conn.commit()
-            flash('Admin registered! You may now log in.', 'success')
-            return redirect(url_for('admin_login'))
+        cursor.execute("INSERT INTO users (email, password, role) VALUES (?, ?, ?)", (email, hashed_password, 'admin'))
+        conn.commit()
+        conn.close()
+        flash('Admin registered! You may now log in.', 'success')
+        return redirect(url_for('admin_login'))
 
     return render_template('admin_register.html')
 
@@ -271,8 +291,7 @@ def profile():
         return redirect(url_for('login'))
 
     user_id = session['user_id']
-    conn = sqlite3.connect('food_ordering.db')
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     if request.method == 'POST':
@@ -304,6 +323,7 @@ def profile():
         params.append(user_id)
         cursor.execute(f"UPDATE users SET {update_fields} WHERE user_id=?", tuple(params))
         conn.commit()
+        conn.close()
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))
 
@@ -318,6 +338,156 @@ def admin_dashboard():
         flash('Please log in as admin.', 'warning')
         return redirect(url_for('admin_login'))
     return render_template('admin_dashboard.html')
+
+@app.route('/admin/overview')
+def admin_overview():
+    return render_template('admin_overview.html')
+
+@app.route('/admin/manage')
+def admin_manage():
+    conn = get_db_connection()
+    products = conn.execute('SELECT * FROM menu_items').fetchall()
+    orders = conn.execute('SELECT * FROM orders').fetchall()
+    conn.close()
+    return render_template('admin_manage.html', products=products, orders=orders)
+
+@app.route('/admin/add_product', methods=['GET', 'POST'])
+def admin_add_product():
+    if 'admin_id' not in session:
+        flash('Please log in as admin.', 'warning')
+        return redirect(url_for('admin_login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        name = request.form['name']
+        description = request.form['description']
+        price = float(request.form['price'])
+        category_id = request.form['category_id']
+        restaurant_id = request.form['restaurant_id']  # <-- Now it exists in the form
+
+        image = request.files['image']
+        image_filename = None
+        if image:
+            image_filename = image.filename
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+
+
+        cursor.execute("""
+            INSERT INTO menu_items (name, description, price, category_id, restaurant_id, image)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (name, description, price, category_id, restaurant_id, image_filename))
+
+        conn.commit()
+        conn.close()
+        flash('Product added successfully!', 'success')
+        return redirect(url_for('admin_manage'))
+
+    # GET request: fetch categories and restaurants
+    cursor.execute("SELECT * FROM categories")
+    categories = cursor.fetchall()
+    cursor.execute("SELECT * FROM restaurants")
+    restaurants = cursor.fetchall()
+    conn.close()
+    return render_template('add_product.html', categories=categories, restaurants=restaurants)
+
+
+@app.route('/admin/add_category', methods=['GET', 'POST'])
+def admin_add_category():
+    if 'admin_id' not in session:
+        flash('Please log in as admin.', 'warning')
+        return redirect(url_for('admin_login'))
+
+    if request.method == 'POST':
+        category_name = request.form['name'].strip()
+
+        if not category_name:
+            flash('Category name is required.', 'danger')
+            return render_template('add_category.html')
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM categories WHERE name = ?", (category_name,))
+        if cursor.fetchone():
+            flash('Category already exists.', 'danger')
+            conn.close()
+            return render_template('add_category.html')
+
+        cursor.execute("INSERT INTO categories (name) VALUES (?)", (category_name,))
+        conn.commit()
+        conn.close()
+        flash('Category added successfully!', 'success')
+        return redirect(url_for('admin_manage'))
+
+    return render_template('add_category.html')
+
+@app.route('/admin/add_restaurant', methods=['GET', 'POST'])
+def admin_add_restaurant():
+    if 'admin_id' not in session:
+        flash('Please log in as admin.', 'warning')
+        return redirect(url_for('admin_login'))
+
+    if request.method == 'POST':
+        name = request.form['name']
+        location = request.form['location']
+        contact = request.form['contact']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO restaurants (name, location, contact)
+            VALUES (?, ?, ?)
+        """, (name, location, contact))
+        conn.commit()
+        conn.close()
+
+        flash('Restaurant added successfully!', 'success')
+        return redirect(url_for('admin_manage'))
+
+    return render_template('add_restaurant.html')
+
+@app.route('/admin/edit_product/<int:product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    if request.method == 'POST':
+        name = request.form['name']
+        description = request.form['description']
+        price = request.form['price']
+        category_id = request.form['category_id']
+        restaurant_id = request.form['restaurant_id']
+
+        cursor.execute('''
+            UPDATE menu_items
+            SET name = ?, description = ?, price = ?, category_id = ?, restaurant_id = ?
+            WHERE item_id = ?
+        ''', (name, description, price, category_id, restaurant_id, product_id))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('admin_manage'))
+
+    cursor.execute('SELECT * FROM menu_items WHERE item_id = ?', (product_id,))
+    product = cursor.fetchone()
+
+    cursor.execute('SELECT * FROM categories')
+    categories = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM restaurants')
+    restaurants = cursor.fetchall()
+
+    conn.close()
+    return render_template('edit_product.html', product=product, categories=categories, restaurants=restaurants)
+
+@app.route('/admin/delete_product/<int:product_id>')
+def delete_product(product_id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM menu_items WHERE item_id = ?', (product_id,))
+    conn.commit()
+    conn.close()
+    flash('Product deleted successfully.', 'success')
+    return redirect(url_for('admin_manage'))
 
 @app.route('/initdb')
 def create_tables():
