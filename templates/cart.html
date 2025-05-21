@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Your Orders</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f9f9f9;
+            padding: 40px;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #f44336;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #eee;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f44336;
+            color: white;
+        }
+
+        td img {
+            max-width: 60px;
+            border-radius: 5px;
+        }
+
+        .quantity-controls a {
+            margin: 0 5px;
+            text-decoration: none;
+            font-weight: bold;
+            color: #f44336;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .checkout-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+            transition: background-color 0.3s;
+        }
+
+        .checkout-btn:hover {
+            background-color: #d7372e;
+        }
+
+        .empty-msg {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+            padding: 50px;
+        }
+
+        p strong {
+            font-size: 18px;
+            color: #333;
+            display: block;
+            text-align: right;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <h1>Your Cart / Orders</h1>
+
+    {% if cart_items %}
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Image</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in cart_items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td><img src="{{ url_for('static', filename='uploads/' ~ item.image) }}" alt="{{ item.name }}"></td>
+                <td>₱{{ '%.2f'|format(item.price) }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₱{{ '%.2f'|format(item.price * item.quantity) }}</td>
+                <td class="quantity-controls">
+                    <a href="{{ url_for('update_cart_quantity', cart_id=item.cart_id, action='add') }}">+</a>
+                    <a href="{{ url_for('update_cart_quantity', cart_id=item.cart_id, action='reduce') }}">−</a>
+                    <a href="{{ url_for('remove_cart_item', cart_id=item.cart_id) }}">x</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <p><strong>Total Price: ₱{{ '%.2f'|format(total_price) }}</strong></p>
+
+    <form action="{{ url_for('checkout') }}" method="post">
+        <button type="submit" class="checkout-btn">Checkout</button>
+    </form>
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{{ url_for('dashboard') }}" style="
+        background-color: #555;
+        color: white;
+        padding: 10px 25px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 16px;
+        display: inline-block;
+        transition: background-color 0.3s;
+    " onmouseover="this.style.backgroundColor='#333'" onmouseout="this.style.backgroundColor='#555'">← Back to Dashboard</a>
+</div>
+    {% else %}
+    <p class="empty-msg">Your cart is empty.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

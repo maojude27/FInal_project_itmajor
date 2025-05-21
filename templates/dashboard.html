@@ -72,26 +72,127 @@
         .content h2 {
             color: #f44336;
         }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section label {
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .product-card h4 {
+            color: #f44336;
+            margin: 10px 0 5px;
+        }
+
+        .product-card p {
+            margin: 4px 0;
+            font-size: 14px;
+        }
+
+        .product-card a {
+            display: inline-block;
+            margin-top: 10px;
+            background-color: #f44336;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .product-card a:hover {
+            background-color: #d32f2f;
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-title">Karenderia Dashboard</div>
-        <div class="dropdown">
-            <button>Profile</button>
-            <div class="dropdown-content">
-                <a href="/profile">Profile</a>
-                <a href="/orders">Orders</a>
-                <a href="/logout">Logout</a>
-            </div>
+<header>
+    <div class="header-title">Karenderia Dashboard</div>
+    <div class="dropdown">
+        <button>Profile</button>
+        <div class="dropdown-content">
+            <a href="/profile">Profile</a>
+            <a href="/orders">Orders</a>
+            <a href="/logout">Logout</a>
         </div>
-    </header>
-
-    <div class="content">
-        <h2>Welcome, {{ name }}!</h2>
-        <p>This is your customer dashboard.</p>
     </div>
+</header>
+
+<div class="content">
+    <h2>Welcome, {{ name }}!</h2>
+    <p>This is your customer dashboard.</p>
+
+    <div class="filter-section">
+        <h3>Filter by Category</h3>
+        {% for category in categories %}
+            <label>
+                <input type="checkbox" class="category-filter" value="{{ category['name'] }}" checked>
+                {{ category['name'] }}
+            </label>
+        {% endfor %}
+    </div>
+
+    <h3>Available Menu Items</h3>
+    <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card" data-category="{{ product['category_name'] }}">
+            <img src="{{ url_for('static', filename='uploads/' ~ product['image']) }}" alt="{{ product['name'] }}">
+            <h4>{{ product['name'] }}</h4>
+            <p>{{ product['description'] }}</p>
+            <p><strong>₱{{ product['price'] }}</strong></p>
+            <p>Category: {{ product['category_name'] }}</p>
+            <p>Restaurant: {{ product['restaurant_name'] }}</p>
+            <a href="{{ url_for('view_product', product_id=product['item_id']) }}">View Details</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    const checkboxes = document.querySelectorAll('.category-filter');
+    const products = document.querySelectorAll('.product-card');
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            const selected = Array.from(checkboxes)
+                                  .filter(c => c.checked)
+                                  .map(c => c.value);
+
+            products.forEach(product => {
+                const category = product.getAttribute('data-category');
+                if (selected.includes(category)) {
+                    product.style.display = 'block';
+                } else {
+                    product.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

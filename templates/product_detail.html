@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product['name'] }} - Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .product-img { max-width: 100%; border-radius: 10px; margin-bottom: 20px; }
+        .price { color: #f44336; font-size: 24px; }
+        .section { margin-top: 30px; }
+        input[type=number], textarea, select {
+            width: 100%; padding: 8px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;
+        }
+        button {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #d32f2f; }
+        .review {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .review img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .review-content {
+            flex: 1;
+        }
+        .review-user {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+            {% for category, message in messages %}
+                <div style="background-color: {% if category == 'success' %}#4CAF50{% elif category == 'warning' %}#ff9800{% elif category == 'danger' %}#f44336{% else %}#2196F3{% endif %};
+                            color: white; padding: 10px 20px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            setTimeout(() => {
+                const flashBox = document.querySelectorAll('[style*="position: fixed"] > div');
+                flashBox.forEach(div => div.remove());
+            }, 3000);
+        </script>
+    {% endif %}
+{% endwith %}
+
+<div class="container">
+    <h1>{{ product['name'] }}</h1>
+    <img class="product-img" src="{{ url_for('static', filename='uploads/' ~ product['image']) }}" alt="{{ product['name'] }}">
+    <p>{{ product['description'] }}</p>
+    <p class="price">₱{{ product['price'] }}</p>
+
+    <form action="/add_to_cart" method="POST" id="cartForm">
+        <input type="hidden" name="item_id" value="{{ product['item_id'] }}">
+        <label>Quantity:</label>
+        <input type="number" name="quantity" id="quantity" value="1" min="1">
+        <p><strong>Total: ₱<span id="total">{{ product['price'] }}</span></strong></p>
+        <button type="submit">Add to Cart</button>
+    </form>
+
+    <div class="section">
+        <h3>{% if user_review %}Edit Your Review{% else %}Leave a Rating & Comment{% endif %}</h3>
+        <form action="{{ '/update_review' if user_review else '/leave_review' }}" method="POST">
+            <input type="hidden" name="item_id" value="{{ product['item_id'] }}">
+            <label>Rating (1-5):</label>
+            <select name="rating" required>
+                {% for i in range(1, 6) %}
+                    <option value="{{ i }}" {% if user_review and user_review['rating'] == i %}selected{% endif %}>{{ i }}</option>
+                {% endfor %}
+            </select>
+            <label>Comment:</label>
+            <textarea name="comment" rows="4" required>{{ user_review['comment'] if user_review else '' }}</textarea>
+            <button type="submit">{{ 'Update Review' if user_review else 'Submit Review' }}</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h3>Customer Reviews</h3>
+        {% if reviews %}
+            {% for review in reviews %}
+                <div class="review">
+                    <img src="{{ url_for('static', filename='profile_pics/' ~ (review['profile_pic'] if review['profile_pic'] else 'default.jpg')) }}" alt="User">
+                    <div class="review-content">
+                        <div class="review-user">{{ review['username'] }}</div>
+                        <div><strong>Rating:</strong> {{ review['rating'] }}</div>
+                        <p>{{ review['comment'] }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No reviews yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    const price = {{ product['price'] }};
+    const quantityInput = document.getElementById('quantity');
+    const totalSpan = document.getElementById('total');
+
+    quantityInput.addEventListener('input', () => {
+        const qty = parseInt(quantityInput.value) || 0;
+        totalSpan.textContent = (price * qty).toFixed(2);
+    });
+</script>
+</body>
+</html>
