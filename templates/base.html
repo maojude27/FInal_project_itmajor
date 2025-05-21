@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Karenderia</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #f44336;
+            padding: 15px 20px;
+            color: white;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo a {
+            color: white;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        .login-btn {
+            background-color: white;
+            color: #f44336;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .hero-image, .about-image {
+            background-color: #ddd;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #333;
+            margin: 20px;
+        }
+
+        .welcome {
+            text-align: center;
+            padding: 20px;
+        }
+
+        footer {
+            background-color: #f44336;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: 40px;
+        }
+
+        .flash-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+        .flash-message {
+            margin-bottom: 10px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            min-width: 250px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            animation: fadeout 5s forwards;
+            cursor: pointer;
+        }
+
+        .flash-message.success { background-color: #4CAF50; }
+        .flash-message.danger  { background-color: #f44336; }
+        .flash-message.info    { background-color: #2196F3; }
+        .flash-message.warning { background-color: #ff9800; }
+
+        @keyframes fadeout {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Flash Toasts -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <script>
+        // Allow dismiss on click
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.flash-message').forEach(msg => {
+                msg.addEventListener('click', () => {
+                    msg.style.display = 'none';
+                });
+            });
+        });
+    </script>
+
+    <!-- Header -->
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <a href="{{ url_for('home') }}">Karenderia</a>
+            </div>
+            <nav>
+                {% if request.endpoint != 'about' %}
+                    <a href="{{ url_for('about') }}">About</a>
+                {% endif %}
+                <a href="/login"><button class="login-btn">Login</button></a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Karenderia. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

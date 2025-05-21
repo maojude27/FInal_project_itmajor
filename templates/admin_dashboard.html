@@ -1,0 +1,35 @@
+<!-- templates/admin_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <div class="bg-red-700 text-white flex justify-between items-center px-6 py-4">
+        <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+        <a href="{{ url_for('logout') }}" class="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex justify-center mt-16">
+        <div class="bg-white shadow-lg rounded-md p-10 w-[700px]">
+            <h2 class="text-xl font-semibold text-red-700 text-center mb-6">Welcome, Admin!</h2>
+            
+            <!-- Dashboard Overview -->
+            <div class="bg-red-100 border-l-4 border-red-500 p-4 mb-4">
+                <h3 class="font-bold text-red-700">Dashboard Overview</h3>
+                <p class="text-gray-800 text-sm">Overview of orders, products, sales, and customer activities.</p>
+            </div>
+
+            <!-- Product Management -->
+            <div class="bg-red-100 border-l-4 border-red-500 p-4">
+                <h3 class="font-bold text-red-700">Product & Order Management</h3>
+                <p class="text-gray-800 text-sm">Add, edit, or delete products. View and update customer orders.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

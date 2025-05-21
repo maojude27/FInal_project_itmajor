@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .profile-container {
+            max-width: 500px;
+            margin: auto;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .profile-container h2 {
+            color: red;
+        }
+
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid red;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 7px;
+            margin: 5px 0 15px;
+        }
+
+        input[type="file"] {
+            margin: 10px 0;
+        }
+
+        button, a {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        a {
+            color: purple;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        button {
+            background-color: #f44336;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <h2>My Profile</h2>
+        <img class="profile-image" src="{{ url_for('static', filename='uploads/' + user['profile_image']) }}" alt="Profile Image">
+        <form action="/profile" method="POST" enctype="multipart/form-data">
+            <input type="file" name="profile_image"><br>
+
+            <label>Name:</label>
+            <input type="text" name="name" value="{{ user['name'] }}">
+
+            <label>Email:</label>
+            <input type="email" name="email" value="{{ user['email'] }}">
+
+            <label>Phone:</label>
+            <input type="text" name="contact" value="{{ user['contact'] }}">
+
+            <label>Address:</label>
+            <input type="text" name="address" value="{{ user['address'] or '' }}">
+
+            <label>Change Password:</label>
+            <input type="password" name="password" placeholder="Enter new password">
+
+            <button type="submit">Save Changes</button>
+        </form>
+        <a href="/dashboard">Back</a>
+    </div>
+</body>
+</html>

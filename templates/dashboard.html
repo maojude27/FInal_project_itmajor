@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Karenderia Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+        }
+
+        header {
+            background-color: #f44336;
+            padding: 15px 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown button {
+            background-color: white;
+            color: #f44336;
+            border: none;
+            padding: 5px 10px;
+            font-weight: bold;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 120px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+        }
+
+        .dropdown-content a {
+            color: #f44336;
+            padding: 10px 12px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ffe6e6;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .content h2 {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">Karenderia Dashboard</div>
+        <div class="dropdown">
+            <button>Profile</button>
+            <div class="dropdown-content">
+                <a href="/profile">Profile</a>
+                <a href="/orders">Orders</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="content">
+        <h2>Welcome, {{ name }}!</h2>
+        <p>This is your customer dashboard.</p>
+    </div>
+
+</body>
+</html>
