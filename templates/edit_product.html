@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Product</title>
+    <style>
+        body { background-color: #f3f3f3; font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: #b91c1c; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        img {
+            max-width: 100px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        a.back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('admin_manage') }}" class="back-link">← Back to Product Management</a>
+        <h2>Edit Product</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <label for="name">Product Name</label>
+            <input type="text" name="name" id="name" value="{{ product['name'] }}" required>
+
+            <label for="description">Description</label>
+            <textarea name="description" id="description" rows="4" required>{{ product['description'] }}</textarea>
+
+            <label for="price">Price (₱)</label>
+            <input type="number" name="price" id="price" step="0.01" value="{{ product['price'] }}" required>
+
+            <label for="category_id">Category</label>
+            <select name="category_id" id="category_id" required>
+                {% for category in categories %}
+                <option value="{{ category['category_id'] }}" {% if category['category_id'] == product['category_id'] %}selected{% endif %}>{{ category['name'] }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="restaurant_id">Restaurant</label>
+            <select name="restaurant_id" id="restaurant_id" required>
+                {% for restaurant in restaurants %}
+                <option value="{{ restaurant['restaurant_id'] }}" {% if restaurant['restaurant_id'] == product['restaurant_id'] %}selected{% endif %}>{{ restaurant['name'] }}</option>
+                {% endfor %}
+            </select>
+
+            {% if product['image'] %}
+            <label>Current Image:</label>
+            <img src="{{ url_for('static', filename='images/' + product['image']) }}" alt="Product Image">
+            {% endif %}
+
+            <label for="image">Upload New Image (optional)</label>
+            <input type="file" name="image" id="image" accept="image/*">
+
+            <input type="submit" value="Update Product">
+        </form>
+    </div>
+</body>
+</html>

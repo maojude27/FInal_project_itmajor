@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Restaurant</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f3f3; }
+        .container {
+            max-width: 600px; margin: 50px auto; background: white;
+            padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h2 { color: #b91c1c; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"] {
+            width: 100%; padding: 10px; margin-bottom: 20px;
+            border: 1px solid #ccc; border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50; color: white;
+            border: none; padding: 10px 20px;
+            border-radius: 4px; cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        a.back-link {
+            display: inline-block; margin-bottom: 20px;
+            text-decoration: none; color: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('admin_manage') }}" class="back-link">← Back to Admin Panel</a>
+        <h2>Add New Restaurant</h2>
+        <form method="POST">
+            <label for="name">Restaurant Name</label>
+            <input type="text" name="name" id="name" required>
+
+            <label for="location">Location</label>
+            <input type="text" name="location" id="location" required>
+
+            <label for="contact">Contact</label>
+            <input type="text" name="contact" id="contact" required>
+
+            <input type="submit" value="Add Restaurant">
+        </form>
+    </div>
+</body>
+</html>

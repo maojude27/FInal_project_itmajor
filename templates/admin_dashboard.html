@@ -1,35 +1,101 @@
-<!-- templates/admin_dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #b91c1c;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+        }
+        .navbar a {
+            background-color: #dc2626;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            margin-top: 60px;
+        }
+        .card {
+            background-color: white;
+            padding: 40px;
+            width: 700px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            text-align: center;
+            color: #b91c1c;
+            margin-bottom: 30px;
+        }
+        .section {
+            border-left: 5px solid #dc2626;
+            background-color: #ffe5e5;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #b91c1c;
+        }
+        .section p {
+            margin: 5px 0 15px;
+            color: #333;
+        }
+        .section a {
+            background-color: #b91c1c;
+            color: white;
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .section a:hover {
+            background-color: #991b1b;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
+<body>
+
     <!-- Navbar -->
-    <div class="bg-red-700 text-white flex justify-between items-center px-6 py-4">
-        <h1 class="text-2xl font-bold">Admin Dashboard</h1>
-        <a href="{{ url_for('logout') }}" class="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded">Logout</a>
+    <div class="navbar">
+        <h1>Admin Dashboard</h1>
+        <a href="{{ url_for('logout') }}">Logout</a>
     </div>
 
     <!-- Main Content -->
-    <div class="flex justify-center mt-16">
-        <div class="bg-white shadow-lg rounded-md p-10 w-[700px]">
-            <h2 class="text-xl font-semibold text-red-700 text-center mb-6">Welcome, Admin!</h2>
-            
+    <div class="container">
+        <div class="card">
+            <h2>Welcome, Admin!</h2>
+
             <!-- Dashboard Overview -->
-            <div class="bg-red-100 border-l-4 border-red-500 p-4 mb-4">
-                <h3 class="font-bold text-red-700">Dashboard Overview</h3>
-                <p class="text-gray-800 text-sm">Overview of orders, products, sales, and customer activities.</p>
+            <div class="section">
+                <h3>Dashboard Overview</h3>
+                <p>Overview of orders, products, sales, and customer activities.</p>
+                <a href="{{ url_for('admin_overview') }}">Go to Overview</a>
             </div>
 
-            <!-- Product Management -->
-            <div class="bg-red-100 border-l-4 border-red-500 p-4">
-                <h3 class="font-bold text-red-700">Product & Order Management</h3>
-                <p class="text-gray-800 text-sm">Add, edit, or delete products. View and update customer orders.</p>
+            <!-- Product & Order Management -->
+            <div class="section">
+                <h3>Product & Order Management</h3>
+                <p>Add, edit, or delete products. View and update customer orders.</p>
+                <a href="{{ url_for('admin_manage') }}">Manage Products & Orders</a>
             </div>
         </div>
     </div>
+
 </body>
 </html>
