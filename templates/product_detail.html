@@ -31,11 +31,11 @@
             gap: 15px;
         }
         .review img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 50%;
-        }
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+}
         .review-content {
             flex: 1;
         }
@@ -66,6 +66,11 @@
 {% endwith %}
 
 <div class="container">
+    <!-- Back to Dashboard Button -->
+    <a href="/dashboard" style="display: inline-block; margin-bottom: 20px; padding: 10px 15px; background-color: #2196F3; color: white; text-decoration: none; border-radius: 5px;">
+        ← Back to Dashboard
+    </a>
+
     <h1>{{ product['name'] }}</h1>
     <img class="product-img" src="{{ url_for('static', filename='uploads/' ~ product['image']) }}" alt="{{ product['name'] }}">
     <p>{{ product['description'] }}</p>
@@ -100,7 +105,7 @@
         {% if reviews %}
             {% for review in reviews %}
                 <div class="review">
-                    <img src="{{ url_for('static', filename='profile_pics/' ~ (review['profile_pic'] if review['profile_pic'] else 'default.jpg')) }}" alt="User">
+                    <img src="{{ url_for('static', filename='uploads/' ~ (review['profile_image'] if review['profile_image'] else 'default.jpg')) }}" alt="User">
                     <div class="review-content">
                         <div class="review-user">{{ review['username'] }}</div>
                         <div><strong>Rating:</strong> {{ review['rating'] }}</div>

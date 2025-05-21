@@ -85,6 +85,25 @@
 
             <button type="submit">Save Changes</button>
         </form>
+        <hr style="margin: 30px 0;">
+
+    <h3 style="color: #f44336;">My Orders</h3>
+    {% if orders %}
+        <div style="text-align: left; margin-top: 20px;">
+            {% for order in orders %}
+    <div class="order-box">
+        <p><strong>Order ID:</strong> {{ order.id }}</p>
+        <p><strong>Items:</strong> {{ order.item_list }}</p>
+        <p><strong>Total:</strong> ₱{{ order.total }}</p>
+        <p><strong>Status:</strong> {{ order.status }}</p>
+        <p><strong>Date:</strong> {{ order.date }}</p>
+    </div>
+{% endfor %}
+        </div>
+    {% else %}
+    <p style="margin-top: 20px; color: #888;">You have no orders yet.</p>
+{% endif %}
+
         <a href="/dashboard">Back</a>
     </div>
 </body>

@@ -5,25 +5,25 @@
     <title>Your Orders</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
             background: #f9f9f9;
-            padding: 40px;
             margin: 0;
+            padding: 0;
         }
-        
+
         .container {
             max-width: 1000px;
-            margin: 0 auto;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin: 100px auto;
+            background: white;
             padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
-            color: #f44336;
-            margin-bottom: 30px;
             text-align: center;
+            color: #f44336;
+            margin-bottom: 25px;
         }
 
         table {
@@ -58,20 +58,19 @@
         }
 
         .checkout-btn {
+            width: 100%;
+            padding: 12px;
             background-color: #f44336;
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
             font-size: 16px;
+            border-radius: 4px;
             cursor: pointer;
-            display: block;
-            margin: 0 auto;
-            transition: background-color 0.3s;
+            margin-top: 20px;
         }
 
         .checkout-btn:hover {
-            background-color: #d7372e;
+            background-color: #d32f2f;
         }
 
         .empty-msg {
@@ -88,12 +87,31 @@
             text-align: right;
             margin-top: 20px;
         }
+
+        .back-link {
+            background-color: #555;
+            color: white;
+            padding: 10px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+
+        .back-link:hover {
+            background-color: #333;
+        }
+
+        .center {
+            text-align: center;
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    
     <h1>Your Cart / Orders</h1>
 
     {% if cart_items %}
@@ -128,21 +146,14 @@
 
     <p><strong>Total Price: ₱{{ '%.2f'|format(total_price) }}</strong></p>
 
-    <form action="{{ url_for('checkout') }}" method="post">
-        <button type="submit" class="checkout-btn">Checkout</button>
+    <form action="{{ url_for('process_checkout') }}" method="get">
+        <button type="submit" class="checkout-btn">Proceed to Checkout</button>
     </form>
-<div style="text-align: center; margin-top: 30px;">
-    <a href="{{ url_for('dashboard') }}" style="
-        background-color: #555;
-        color: white;
-        padding: 10px 25px;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 16px;
-        display: inline-block;
-        transition: background-color 0.3s;
-    " onmouseover="this.style.backgroundColor='#333'" onmouseout="this.style.backgroundColor='#555'">← Back to Dashboard</a>
-</div>
+
+    <div class="center">
+        <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+    </div>
+
     {% else %}
     <p class="empty-msg">Your cart is empty.</p>
     {% endif %}
