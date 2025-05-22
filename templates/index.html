@@ -1,9 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+  /* Center container and limit width */
+  .about {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  /* Banner style */
+  .about-banner {
+    width: 100%;
+    max-width: 2000px; /* max width for banner */
+    height: 300px; /* fixed height */
+    object-fit: cover; /* crop nicely */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    display: block;
+  }
+</style>
 <main>
-    <section class="hero">
-        <div class="hero-image">[ Landing Image Placeholder ]</div>
+    <section class="about">
+        <img src="{{ url_for('static', filename='uploads/web3.jpg') }}" alt="About Us Image" class="about-banner">
     </section>
 
     <section class="welcome">
@@ -12,7 +33,7 @@
     </section>
 
     <section class="about">
-        <div class="about-image">[ About Us Image Placeholder ]</div>
+        <img src="{{ url_for('static', filename='uploads/web5.jpg') }}" alt="About Us Image" class="about-banner">
     </section>
 </main>
 {% endblock %}
