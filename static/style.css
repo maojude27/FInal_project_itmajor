@@ -12,3 +12,20 @@ footer {
     padding: 10px;
     margin-top: 40px;
 }
+.about {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.about-banner {
+  width: 50%;
+  max-width: 3200px;  /* or whatever max width you want */
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px; /* optional rounded corners */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
